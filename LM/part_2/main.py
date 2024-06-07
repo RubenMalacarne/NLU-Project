@@ -20,30 +20,37 @@ class Parameters:
     N_EPOCHS = 100
     PATIENCE = 10
 
-    TRAINING = False
+    TRAINING = True
     EVALUATION = True
 
     BATCH_SIZE_TRAIN  = 16
-    BATCH_SIZE        = 512
+    BATCH_SIZE        = 128
 
 final_ppl_dict = {}
 
 '''
   these are the best parameters found that I decided to bring for each type
 '''
-# parameter_sets = [
+# parameter_sets = [      1
 #     {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM"},
 #     {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT"},
 #     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT+VD"},
 #     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.95,"description": "LSTM+VD+WT+NTASG"}
 # ]
 
+# parameter_sets = [      2
+#     {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT+VD"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.95,"description": "LSTM+VD+WT+NTASG"}
+# ]
+
 parameter_sets = [
-    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT+VD"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.95,"description": "LSTM+VD+WT+NTASG"}
-]
+    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM+WT"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM+WT+VD"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.9,"description": "LSTM+VD+WT+NTASG"}
+]   #198 di ntasgd
 if __name__ == "__main__":
 
 
@@ -116,5 +123,4 @@ if __name__ == "__main__":
                     test_loader,
                     criterion_eval,
                     load_eval_model(Parameters.DEVICE,sample_params["description"]))
-      breakpoint()
       plot_result(final_ppl_dict)

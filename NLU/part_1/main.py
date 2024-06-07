@@ -21,7 +21,7 @@ class Parameters:
   LR = 0.0001
   CLIP = 5
   VOCAB_LEN = lambda x: len(x.word2id)
-  N_EPOCHS = 10
+  N_EPOCHS = 100
   PATIENCE = 5
   BIDIRECTIONAL = False
   DRPOUT = True

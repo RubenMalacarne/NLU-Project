@@ -16,26 +16,19 @@ class ModelIAS(nn.Module):
         else:
           self.utt_encoder = nn.LSTM(emb_size, hid_size, n_layer, bidirectional=False, batch_first=True)
 
-        #self.utt_encoder = nn.LSTM(emb_size, hid_size, n_layer, bidirectional=False, batch_first=True)
-        #??come ridimensionare la matrice sum hidden state
         if bidirectional: self.slot_out = nn.Linear(hid_size*2, out_slot)
         else: self.slot_out = nn.Linear(hid_size, out_slot)
-        # Dropout layer How/Where do we apply it? --> what's happen here???
-        # self.dropout = nn.Dropout(out_dropout) da provare a commentare l'utimo
+
         if dropout:
           self.dropout = nn.Dropout(out_dropout)
         self.intent_out = nn.Linear(hid_size, out_int)
 
     def forward(self, utterance, seq_lengths):
-        self.utt_encoder.flatten_parameters()  # Aggiungi questa linea per compattare i pesi
-        # utterance.size() = batch_size X seq_len
-        utt_emb = self.embedding(utterance) # utt_emb.size() = batch_size X seq_len X emb_size
-        #print("Dimensione dell'embedding:", utt_emb.size())
-        # pack_padded_sequence avoid computation over pad tokens reducing the computational cost
-        # utt_emb = utt_emb.permute(1, 0, 2) #perchè?????
+        self.utt_encoder.flatten_parameters()  
+        utt_emb = self.embedding(utterance)
 
         packed_input = pack_padded_sequence(utt_emb, seq_lengths.cpu().numpy(), batch_first=True)
-        # Process the batch
+        
         packed_output, (last_hidden, cell) = self.utt_encoder(packed_input)
         #print("Dimensione dell'output LSTM prima del padding:", packed_output.data.size())
 
@@ -46,8 +39,6 @@ class ModelIAS(nn.Module):
         last_hidden = last_hidden[-1,:,:]
         #print("Dimensione dell'ultimo hidden state:", last_hidden.size())
 
-        # Is this another possible way to get the last hiddent state? (Why?)
-        # utt_encoded.permute(1,0,2)[-1]
 
         # Compute slot logits
         slots = self.slot_out(utt_encoded)
