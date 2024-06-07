@@ -42,6 +42,9 @@ final_slot_met = {}
 if __name__ == "__main__":
     
     if Parameters.TRAIN:
+        '''
+          in this session there is the part of training and preparation of variables for the model
+        '''
         train_raw,dev_raw,test_raw,lang =pre_preparation_train()
         # Create our datasets
         train_dataset, dev_loader, test_dataset, lang =get_dataset(train_raw, dev_raw, test_raw)
@@ -67,6 +70,11 @@ if __name__ == "__main__":
         torch.cuda.empty_cache()
         torch.cuda.empty_cache()
     if Parameters.TEST:  
+        ''' 
+          in this session there is the evaluation part of the model which allows to verify 
+          the model towed previously and in the end convert the dictionary format of Intent values and slots for the next graphs
+          for the final plot i should to use another code placed on plot_NLU
+        '''
         model,lang,test_loader=load_eval_object(Parameters.DEVICE,"bert")
         model.eval()
         slot_res, intent_res = eval_part(Parameters.CRITERSION_SLOTS,

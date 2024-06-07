@@ -1,23 +1,11 @@
-import torch
-import torch.nn as nn
+
 import torch.optim as optim
 import torch.nn.functional as F
-import numpy as np
-
-import torch
 import torch.utils.data as data
-
-# RNN Elman version
-# We are not going to use this since for efficiently purposes it's better to use the RNN layer provided by pytorch
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
 import math
 import numpy as np
-
-# RNN Elman version
-# We are not going to use this since for efficiently purposes it's better to use the RNN layer provided by pytorch
 
 class RNN_LSTM(nn.Module):
     def __init__(self, RNN, emb_size, hidden_size, vocab_size, pad_index=0, out_dropout=0.1,

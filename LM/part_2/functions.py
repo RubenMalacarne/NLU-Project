@@ -11,7 +11,9 @@ import copy
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 def pre_preparation_train(BOOL_NTASGD,EMB_SIZE,HID_SIZE,VOCAB_LEN,LR,DEVICE,BOOL_WAIT_TYINING,BOOL_VD,BATCH_SIZE,BATCH_SIZE_TRAIN):
-
+    '''
+        Performs a series of operations to prepare data for training a model
+    '''
     #preparation to train the dataset:
     download_dataset()
     train_raw, dev_raw, test_raw= get_raw_dataset()
@@ -49,6 +51,107 @@ def pre_preparation_train(BOOL_NTASGD,EMB_SIZE,HID_SIZE,VOCAB_LEN,LR,DEVICE,BOOL
     ##la perplexity è calcolata in base alla somma dei criteri sopra diviso per il numero totale di sample
     #[(L1+L2)/number of total of samples]
     return train_loader,dev_loader,test_loader, model,optimizer,criterion_train,criterion_eval,lang
+
+def train_part_NASGD(N_EPOCHS,CLIP,PATIENCE,BOOL_NASGD,optimizer, criterion_train, criterion_eval,model,dev_loader, train_loader, config):
+    '''
+        Full training cycle of a deep learning model, including assessment cycles and early stopping mechanism.
+        early stopping using perplexity
+        is implemented also the NTASGD function
+    '''
+    pOg= copy.deepcopy(patience)
+    losses_train = []
+    losses_dev = []
+    sampled_epochs = []
+    best_ppl = math.inf
+    best_model = None
+    pbar = tqdm(range(1,N_EPOCHS))
+    for epoch in pbar:
+        if not BOOL_NASGD:
+            loss = train_loop(train_loader, optimizer, criterion_train, model, CLIP)
+        else:
+            loss,optimizer = train_loop_NTASGD(train_loader, optimizer, criterion_train, model, config, dev_loader, criterion_eval)
+
+        if epoch % 1 == 0:
+            sampled_epochs.append(epoch)
+            losses_train.append(np.asarray(loss).mean())
+            ppl_dev, loss_dev = eval_loop(dev_loader, criterion_eval, model)
+
+            losses_dev.append(np.asarray(loss_dev).mean())
+            pbar.set_description("PPL: %f, Best: %f" % (ppl_dev, best_ppl))
+            if  ppl_dev < best_ppl: # the lower, the better
+                best_ppl = ppl_dev
+                best_model = copy.deepcopy(model).to('cpu')
+                patience = pOg
+            else:
+                patience -= 1
+
+            if patience <= 0: # Early stopping with patience
+                print('Patience Limit Reached!')
+                break # Not nice but it keeps the code clean
+
+    best_model.to(DEVICE)
+    final_ppl, _ = eval_loop(test_loader, criterion_eval, best_model)
+    print("Test ppl: ", final_ppl)
+    return best_model
+
+
+def train_part(TRAINING,N_EPOCHS,DEVICE,CLIP,PATIENCE,BOOL_NTASGD,optimizer,
+               model,train_loader,dev_loader,test_loader,criterion_eval,
+               criterion_train,config=None):
+    '''
+        Full training cycle of a deep learning model, including assessment cycles and early stopping mechanism.
+        early stopping using perplexity
+        
+    '''
+    if TRAINING:
+      pOg= copy.deepcopy(PATIENCE)
+      losses_train = []
+      losses_dev = []
+      sampled_epochs = []
+      best_ppl = math.inf
+      best_model = None
+      pbar = tqdm(range(1,N_EPOCHS))
+      for epoch in pbar:
+          if not BOOL_NTASGD:
+              loss = train_loop(train_loader, optimizer, criterion_train, model, CLIP)
+          else:
+              loss,optimizer = train_loop_NTASGD(train_loader, optimizer, criterion_train, model, config, dev_loader, criterion_eval)
+
+          if epoch % 1 == 0:
+              sampled_epochs.append(epoch)
+              losses_train.append(np.asarray(loss).mean())
+              ppl_dev, loss_dev = eval_loop(dev_loader, criterion_eval, model)
+
+              losses_dev.append(np.asarray(loss_dev).mean())
+              pbar.set_description("PPL: %f, Best: %f" % (ppl_dev, best_ppl))
+              if  ppl_dev < best_ppl: # the lower, the better
+                  best_ppl = ppl_dev
+                  best_model = copy.deepcopy(model).to('cpu')
+                  patience = pOg
+              else:
+                  patience -= 1
+
+              if patience <= 0: # Early stopping with patience
+                  print('Patience Limit Reached!')
+                  break # Not nice but it keeps the code clean
+
+      best_model.to(DEVICE)
+      final_ppl, _ = eval_loop(test_loader, criterion_eval, best_model)
+      print("Test ppl: ", final_ppl)
+      torch.save(best_model, "best_model.pt")
+
+      return best_model, final_ppl
+
+    else: print ("TRAINING NOT INITIALIZING")
+
+    return best_model
+
+
+def eval_part(EVALUATION,test_loader, criterion_eval, model):
+    if EVALUATION:
+        ppl, _ = eval_loop(test_loader, criterion_eval, model)
+        print("- Test ppl:", ppl)
+    else: print ("evaluation not run")
 
 
 def train_loop_NTASGD(data, optimizer, criterion, model, config, dev_loader, eval_criterion, clip=5):
@@ -95,90 +198,6 @@ def train_loop(data, optimizer, criterion, model, clip=5):
 
     return sum(loss_array)/sum(number_of_tokens)
 
-def train_part_NASGD(N_EPOCHS,CLIP,PATIENCE,BOOL_NASGD,optimizer, criterion_train, criterion_eval,model,dev_loader, train_loader, config):
-    pOg= copy.deepcopy(patience)
-    losses_train = []
-    losses_dev = []
-    sampled_epochs = []
-    best_ppl = math.inf
-    best_model = None
-    pbar = tqdm(range(1,N_EPOCHS))
-    for epoch in pbar:
-        if not BOOL_NASGD:
-            loss = train_loop(train_loader, optimizer, criterion_train, model, CLIP)
-        else:
-            loss,optimizer = train_loop_NTASGD(train_loader, optimizer, criterion_train, model, config, dev_loader, criterion_eval)
-
-        if epoch % 1 == 0:
-            sampled_epochs.append(epoch)
-            losses_train.append(np.asarray(loss).mean())
-            ppl_dev, loss_dev = eval_loop(dev_loader, criterion_eval, model)
-
-            losses_dev.append(np.asarray(loss_dev).mean())
-            pbar.set_description("PPL: %f, Best: %f" % (ppl_dev, best_ppl))
-            if  ppl_dev < best_ppl: # the lower, the better
-                best_ppl = ppl_dev
-                best_model = copy.deepcopy(model).to('cpu')
-                patience = pOg
-            else:
-                patience -= 1
-
-            if patience <= 0: # Early stopping with patience
-                print('Patience Limit Reached!')
-                break # Not nice but it keeps the code clean
-
-    best_model.to(DEVICE)
-    final_ppl, _ = eval_loop(test_loader, criterion_eval, best_model)
-    print("Test ppl: ", final_ppl)
-    return best_model
-
-
-def train_part(TRAINING,N_EPOCHS,DEVICE,CLIP,PATIENCE,BOOL_NTASGD,optimizer,
-               model,train_loader,dev_loader,test_loader,criterion_eval,
-               criterion_train,config=None):
-    if TRAINING:
-      pOg= copy.deepcopy(PATIENCE)
-      losses_train = []
-      losses_dev = []
-      sampled_epochs = []
-      best_ppl = math.inf
-      best_model = None
-      pbar = tqdm(range(1,N_EPOCHS))
-      for epoch in pbar:
-          if not BOOL_NTASGD:
-              loss = train_loop(train_loader, optimizer, criterion_train, model, CLIP)
-          else:
-              loss,optimizer = train_loop_NTASGD(train_loader, optimizer, criterion_train, model, config, dev_loader, criterion_eval)
-
-          if epoch % 1 == 0:
-              sampled_epochs.append(epoch)
-              losses_train.append(np.asarray(loss).mean())
-              ppl_dev, loss_dev = eval_loop(dev_loader, criterion_eval, model)
-
-              losses_dev.append(np.asarray(loss_dev).mean())
-              pbar.set_description("PPL: %f, Best: %f" % (ppl_dev, best_ppl))
-              if  ppl_dev < best_ppl: # the lower, the better
-                  best_ppl = ppl_dev
-                  best_model = copy.deepcopy(model).to('cpu')
-                  patience = pOg
-              else:
-                  patience -= 1
-
-              if patience <= 0: # Early stopping with patience
-                  print('Patience Limit Reached!')
-                  break # Not nice but it keeps the code clean
-
-      best_model.to(DEVICE)
-      final_ppl, _ = eval_loop(test_loader, criterion_eval, best_model)
-      print("Test ppl: ", final_ppl)
-      torch.save(best_model, "best_model.pt")
-
-      return best_model, final_ppl
-
-    else: print ("TRAINING NOT INITIALIZING")
-
-    return best_model
-
 def eval_loop(data, eval_criterion, model):
     model.eval()
     loss_to_return = []
@@ -196,16 +215,10 @@ def eval_loop(data, eval_criterion, model):
     loss_to_return = sum(loss_array) / sum(number_of_tokens)
     return ppl, loss_to_return
 
-
-def eval_part(EVALUATION,test_loader, criterion_eval, model):
-    if EVALUATION:
-        ppl, _ = eval_loop(test_loader, criterion_eval, model)
-        print("- Test ppl:", ppl)
-    else: print ("evaluation not run")
-
-
-
 def save_model(best_model,name):
+    '''
+        Save model to load in a second moment and check the evaluation
+    '''
     print ("salvataggio modello...")
 
     if not os.path.exists("model_pt"):
@@ -213,6 +226,9 @@ def save_model(best_model,name):
     torch.save(best_model, "model_pt/"+name+".pt")
 
 def load_eval_model(DEVICE,name):
+    '''
+        load model to check the evaluation
+    '''
     model = torch.load("model_pt/"+name+'.pt', map_location=DEVICE)
     model.eval()
     return model

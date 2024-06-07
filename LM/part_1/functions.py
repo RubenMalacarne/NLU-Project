@@ -1,4 +1,4 @@
-# Here is where you define the architecture of your model using pytorch
+
 from functools import partial
 from torch.utils.data import DataLoader
 import math
@@ -18,44 +18,6 @@ from utils import *
 from model import *
 
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
-
-def train_loop(data, optimizer, criterion, model, clip=5):
-    '''
-         Used to perform a training epoch on a dataset
-    '''
-    model.train()
-    loss_array = []
-    number_of_tokens = []
-
-    for sample in data:
-        optimizer.zero_grad() # Zeroing the gradient
-        output = model(sample['source'])
-        loss = criterion(output, sample['target'])
-        loss_array.append(loss.item() * sample["number_tokens"])
-        number_of_tokens.append(sample["number_tokens"])
-        loss.backward() # Compute the gradient, deleting the computational graph
-        # clip the gradient to avoid explosioning gradients
-        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-        optimizer.step() # Update the weights
-
-    return sum(loss_array)/sum(number_of_tokens)
-
-def eval_loop(data, eval_criterion, model):
-    model.eval()
-    loss_to_return = []
-    loss_array = []
-    number_of_tokens = []
-    # softmax = nn.Softmax(dim=1) # Use Softmax if you need the actual probability
-    with torch.no_grad(): # It used to avoid the creation of computational graph
-        for sample in data:
-            output = model(sample['source'])
-            loss = eval_criterion(output, sample['target'])
-            loss_array.append(loss.item())
-            number_of_tokens.append(sample["number_tokens"])
-
-    ppl = math.exp(sum(loss_array) / sum(number_of_tokens))
-    loss_to_return = sum(loss_array) / sum(number_of_tokens)
-    return ppl, loss_to_return
 
 def pre_preparation_train(RNN,EMB_SIZE,HID_SIZE,VOCAB_LEN,DEVICE,LR,SGD,ADAM,N_EPOCHS,PATIENCE,CLI,BATCH_SIZE,BATCH_SIZE_TRAIN):
     '''
@@ -135,6 +97,7 @@ def train_part(TRAINING,PATIENCE,N_EPOCHS,CLIP,DEVICE,train_loader,dev_loader,te
         final_ppl = 0
     return final_ppl,best_model
 
+
 def eval_part(EVALUATION,test_loader, criterion_eval, model):
     if EVALUATION:
         ppl, _ = eval_loop(test_loader, criterion_eval, model)
@@ -143,6 +106,46 @@ def eval_part(EVALUATION,test_loader, criterion_eval, model):
         print("eval non inizializzato")
         ppl = 0
     return ppl
+
+
+def train_loop(data, optimizer, criterion, model, clip=5):
+    '''
+         Used to perform a training epoch on a dataset
+    '''
+    model.train()
+    loss_array = []
+    number_of_tokens = []
+
+    for sample in data:
+        optimizer.zero_grad() # Zeroing the gradient
+        output = model(sample['source'])
+        loss = criterion(output, sample['target'])
+        loss_array.append(loss.item() * sample["number_tokens"])
+        number_of_tokens.append(sample["number_tokens"])
+        loss.backward() # Compute the gradient, deleting the computational graph
+        # clip the gradient to avoid explosioning gradients
+        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
+        optimizer.step() # Update the weights
+
+    return sum(loss_array)/sum(number_of_tokens)
+
+def eval_loop(data, eval_criterion, model):
+    model.eval()
+    loss_to_return = []
+    loss_array = []
+    number_of_tokens = []
+    # softmax = nn.Softmax(dim=1) # Use Softmax if you need the actual probability
+    with torch.no_grad(): # It used to avoid the creation of computational graph
+        for sample in data:
+            output = model(sample['source'])
+            loss = eval_criterion(output, sample['target'])
+            loss_array.append(loss.item())
+            number_of_tokens.append(sample["number_tokens"])
+
+    ppl = math.exp(sum(loss_array) / sum(number_of_tokens))
+    loss_to_return = sum(loss_array) / sum(number_of_tokens)
+    return ppl, loss_to_return
+
 
 def save_model(best_model,name):
     '''

@@ -21,19 +21,13 @@ class MODEL_LSTM(nn.Module):
     def __init__(self, input_size, hidden_size, vocab_size,weight_tyining = True,variational_dropout = True , pad_index=0, out_dropout=0.1,
                  emb_dropout=0.1, n_layers=1,dropprob=0.2):
         super(MODEL_LSTM, self).__init__()
-        
         self.embedding = nn.Embedding(vocab_size, input_size,padding_idx=pad_index)
-
         #self.emblin = nn.Linear(hidden_size, input_size) #used to allow weight tying with hidden_size != emb_size
         self.lstm = nn.LSTM(input_size, hidden_size,n_layers)
-
         self.pad_token = pad_index
-
         self.output = nn.Linear(hidden_size, vocab_size)
         self.embedding_dropout = nn.Dropout(emb_dropout)
-
         self.variational_dropout = variational_dropout
-
         self.out_dropout = out_dropout
 
         if weight_tyining:

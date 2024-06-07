@@ -79,10 +79,10 @@ if __name__ == "__main__":
       save_model(best_model,sample_params["description"])
 
       torch.cuda.empty_cache()
-
-  for sample_params  in parameter_sets:
-      final_ppl_dict[sample_params["description"]] = eval_part(Parameters.EVALUATION,
-                                                                test_loader, 
-                                                                criterion_eval, 
-                                                                load_eval_model(Parameters.DEVICE,sample_params["description"]))
-  plot_result(final_ppl_dict)
+  if EVALUATION:
+    for sample_params  in parameter_sets:
+        final_ppl_dict[sample_params["description"]] = eval_part(Parameters.EVALUATION,
+                                                                  test_loader, 
+                                                                  criterion_eval, 
+                                                                  load_eval_model(Parameters.DEVICE,sample_params["description"]))
+    plot_result(final_ppl_dict)

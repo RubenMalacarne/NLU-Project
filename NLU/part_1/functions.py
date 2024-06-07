@@ -45,7 +45,6 @@ def train_part(PATIENCE,N_EPOCHS,CLIP,dev_loader,train_loader,test_loader,lang,o
         Full training cycle of a deep learning model, including assessment cycles and early stopping mechanism
     '''
     print("START TRAINING")
-    #pre_elaboration()
     losses_train = []
     losses_dev = []
     sampled_epochs = []
@@ -199,7 +198,7 @@ def load_eval_model(DEVICE,name):
 # def save_object(best_model,optimizer,lang,vocab_len,out_slot,out_int,w2id,slot2id,intent2id,test_loader,name):
 def save_object(best_model,lang,test_loader,name):
     '''
-        Save model to load in a second moment and check the evaluation
+        Save model and some variables to load in a second moment and check the evaluation
     '''
     print ("salvataggio dizionario...")
     saving_obj = { 
@@ -232,3 +231,21 @@ def load_eval_object(DEVICE,name):
     lang            =saving_obj["lang"]
     test_loader     =saving_obj["test_loader"]
     return model,lang,test_loader
+
+def convertion_dictionary (input_dict, out_dict):
+    '''
+        use to convert for copy paste more easly inside the NLU-plot.py file to see the results
+    '''
+    for key, values in input_dict.items():
+          param_set = {
+              "F1_intent": values[0],
+              "P-intent": values[1],
+              "R-intent": values[2],
+              "description": key
+          }
+          out_dict.append(param_set)
+
+    print(out_dict)
+    
+    
+    

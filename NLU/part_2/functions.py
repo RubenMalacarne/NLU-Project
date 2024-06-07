@@ -64,7 +64,10 @@ def pre_preparation_train():
     return train_raw,dev_raw,test_raw,lang
 
 def train_part(N_EPOCHS,CLIP,PATIENCE,dev_loader,train_loader,test_loader,lang,optimizer,CRITERSION_SLOTS,CRITERSION_INTENTS,model):
-      #pre_elaboration()
+    '''
+        Full training cycle of a deep learning model, including assessment cycles and early stopping mechanism
+    '''
+    print("START TRAINING")
     pOg= copy.deepcopy(PATIENCE)
     n_epochs = N_EPOCHS
     patience = PATIENCE
@@ -129,8 +132,12 @@ def eval_part(CRITERSION_SLOTS,CRITERSION_INTENTS, model,test_loader,lang,slot_r
     
     return slot_res,intent_res
    
-
 def train_loop(CLIP,data, optimizer, criterion_slots, criterion_intents, model):
+    '''
+        Takes as input the training data, an optimizer, 
+        two loss criteria (one for slots and one for intents), 
+        the model, and a gradient clipping value (with a default value of 5)
+    '''
     model.train()
     loss_array = []
     for sample in data:
@@ -200,6 +207,9 @@ def eval_loop(data, criterion_slots, criterion_intents, model, lang):
     return results, report_intent, loss_array
 
 def save_model(best_model,name):
+    '''
+        Save model to load in a second moment and check the evaluation
+    '''
     print ("salvataggio modello...")
 
     if not os.path.exists("model_pt"):
@@ -207,13 +217,16 @@ def save_model(best_model,name):
     torch.save(best_model, "model_pt/"+name+".pth")
 
 def load_eval_model(DEVICE,name):
+    '''
+        load model to check the evaluation
+    '''
     model_load = torch.load("model_pt/"+name+'.pth', map_location=DEVICE)
     model_load.eval()
     return model_load
 
 def save_object(best_model,lang,test_loader,name):
     '''
-        Save model to load in a second moment and check the evaluation
+        Save model and some variables  to load in a second moment and check the evaluation
     '''
     print ("salvataggio dizionario...")
     saving_obj = { 
@@ -238,8 +251,6 @@ def load_eval_object(DEVICE,name):
     lang            =saving_obj["lang"]
     test_loader     =saving_obj["test_loader"]
     return model,lang,test_loader
-
-
 
 
 class Lang():
@@ -273,7 +284,6 @@ class Lang():
             for elem in elements:
                 vocab[elem] = len(vocab)
             return vocab
-
 
 
 def collate_fn(data):

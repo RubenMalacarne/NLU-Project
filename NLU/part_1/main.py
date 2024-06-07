@@ -31,7 +31,7 @@ class Parameters:
   BATCH_SIZE_TRAIN  = 64
   BATCH_SIZE        = 128
   
-  TRAIN = False
+  TRAIN = True
   TEST = True
 
 
@@ -52,12 +52,15 @@ final_slot_met = {}
 if __name__ == "__main__":
 
     if Parameters.TRAIN:
+      '''
+          in this session there is the part of training and preparation of variables for the model
+      '''
       for sample_params  in parameter_sets:
         params = {}
         for key, value in sample_params.items():
           params[key] = value
 
-        intent2id,slot2id,w2id,train_raw,dev_raw,test_raw,lang =pre_preparation_train()
+        intent2id,slot2id,w2id,train_raw,dev_raw,test_raw,lang = pre_preparation_train()
         # Create our datasets
         train_dataset = IntentsAndSlots(train_raw, lang)
         dev_dataset = IntentsAndSlots(dev_raw, lang)
@@ -94,6 +97,11 @@ if __name__ == "__main__":
         torch.cuda.empty_cache()
     
     if Parameters.TEST:   
+      '''
+          in this session there is the evaluation part of the model which allows to verify 
+          the model towed previously and in the end convert the dictionary format of Intent values and slots for the next graphs
+          for the final plot i should to use another code placed on plot_NLU
+      '''
       for sample_params in parameter_sets:
         model, lang, test_loader = load_eval_object(Parameters.DEVICE, sample_params["description"])
           
@@ -113,25 +121,8 @@ if __name__ == "__main__":
 
       param_sets_intent = []
       param_sets_slot = []
+    
+
+      convertion_dictionary (final_intent_met, param_sets_intent)
+      convertion_dictionary (final_slot_met, param_sets_slot)
       
-      for key, values in final_intent_met.items():
-          param_set = {
-              "F1_intent": values[0],
-              "P-intent": values[1],
-              "R-intent": values[2],
-              "description": key
-          }
-          param_sets_intent.append(param_set)
-
-      print(param_sets_intent)
-
-      for key, values in final_slot_met.items():
-          param_set = {
-              "F1_slot": values[0],
-              "P-slot": values[1],
-              "R-slot": values[2],
-              "description": key
-          }
-          param_sets_slot.append(param_set)
-
-      print(param_sets_slot)

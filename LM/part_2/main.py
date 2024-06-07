@@ -1,5 +1,5 @@
-
 from functions import *
+
 class Parameters:  
     '''
       here you can find the hyperparameters 
@@ -102,12 +102,12 @@ if __name__ == "__main__":
 
         save_model(best_model,sample_params["description"])
         torch.cuda.empty_cache()
+    if EVALUATION:
+      for sample_params  in parameter_sets:
+          #evaluation part
+          eval_part(Parameters.EVALUATION,
+                    test_loader,
+                    criterion_eval,
+                    load_eval_model(Parameters.DEVICE,sample_params["description"]))
 
-    for sample_params  in parameter_sets:
-        #evaluation part
-        eval_part(Parameters.EVALUATION,
-                  test_loader,
-                  criterion_eval,
-                  load_eval_model(Parameters.DEVICE,sample_params["description"]))
-
-    plot_result(final_ppl_dict)
+      plot_result(final_ppl_dict)
