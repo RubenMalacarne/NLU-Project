@@ -20,7 +20,7 @@ class Parameters:
     N_EPOCHS = 100
     PATIENCE = 10
 
-    TRAINING = True
+    TRAINING = False
     EVALUATION = True
 
     BATCH_SIZE_TRAIN  = 16
@@ -31,8 +31,15 @@ final_ppl_dict = {}
 '''
   these are the best parameters found that I decided to bring for each type
 '''
+# parameter_sets = [
+#     {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT+VD"},
+#     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.95,"description": "LSTM+VD+WT+NTASG"}
+# ]
+
 parameter_sets = [
-    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM"},
+    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM"},
     {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT"},
     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.0001,"description": "LSTM+WT+VD"},
     {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.95,"description": "LSTM+VD+WT+NTASG"}
@@ -102,12 +109,12 @@ if __name__ == "__main__":
 
         save_model(best_model,sample_params["description"])
         torch.cuda.empty_cache()
-    if EVALUATION:
+    if Parameters.EVALUATION:
       for sample_params  in parameter_sets:
           #evaluation part
-          eval_part(Parameters.EVALUATION,
+          final_ppl_dict[sample_params["description"]] = eval_part(Parameters.EVALUATION,
                     test_loader,
                     criterion_eval,
                     load_eval_model(Parameters.DEVICE,sample_params["description"]))
-
+      breakpoint()
       plot_result(final_ppl_dict)

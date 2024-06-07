@@ -21,7 +21,7 @@ class Parameters:
 
     PATIENCE = 5
 
-    TRAINING = True
+    TRAINING = False
     EVALUATION = True
     
     BATCH_SIZE_TRAIN  = 16
@@ -33,8 +33,8 @@ class Parameters:
 parameter_sets = [
     {"SGD": True,  "ADAM": False,"LR": 0.3, "BATCH_SIZE": 128,"RNN": True, "description": "RNN_SGD"},
     {"SGD": False, "ADAM": True, "LR": 0.0001,"BATCH_SIZE":128,   "RNN": True, "description": "RNN_ADAM"},
-    {"SGD": True, "ADAM": False, "LR": 0.8,"BATCH_SIZE":512,"RNN": False,"description": "LSTM_SGD"},
-    {"SGD": False, "ADAM": True, "LR": 0.01,"BATCH_SIZE":512,"RNN": False,"description": "LSTM_ADAM"}
+    {"SGD": True, "ADAM": False, "LR": 0.8,"BATCH_SIZE":128,"RNN": False,"description": "LSTM_SGD"},
+    {"SGD": False, "ADAM": True, "LR": 0.0001,"BATCH_SIZE":128,"RNN": False,"description": "LSTM_ADAM"}
 ]
 
 #all result for each parameter_sets
@@ -79,7 +79,7 @@ if __name__ == "__main__":
       save_model(best_model,sample_params["description"])
 
       torch.cuda.empty_cache()
-  if EVALUATION:
+  if Parameters.EVALUATION:
     for sample_params  in parameter_sets:
         final_ppl_dict[sample_params["description"]] = eval_part(Parameters.EVALUATION,
                                                                   test_loader, 

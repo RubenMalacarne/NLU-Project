@@ -152,7 +152,7 @@ def eval_part(EVALUATION,test_loader, criterion_eval, model):
         ppl, _ = eval_loop(test_loader, criterion_eval, model)
         print("- Test ppl:", ppl)
     else: print ("evaluation not run")
-
+    return ppl
 
 def train_loop_NTASGD(data, optimizer, criterion, model, config, dev_loader, eval_criterion, clip=5):
     model.train()
