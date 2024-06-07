@@ -1,1 +1,16 @@
 
+LM/part_1/__pycache__/
+LM/part_1/model_pt/
+NLU/part_2/dataset/
+
+LM/part_2/__pycache__/
+LM/part_2/model_pt/
+NLU/part_2/dataset/
+
+NLU/part_1/dataset/
+NLU/part_2/model_pt/
+NLU/part_1/__pycache__/
+
+NLU/part_2/dataset/
+NLU/part_2/model_pt/
+NLU/part_2/__pycache__/
