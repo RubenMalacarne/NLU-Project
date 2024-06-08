@@ -31,7 +31,7 @@ class Parameters:
   BATCH_SIZE_TRAIN  = 64
   BATCH_SIZE        = 128
   
-  TRAIN = True
+  TRAIN = False
   TEST = True
 
 
@@ -123,6 +123,6 @@ if __name__ == "__main__":
       param_sets_slot = []
     
 
-      convertion_dictionary (final_intent_met, param_sets_intent)
-      convertion_dictionary (final_slot_met, param_sets_slot)
+      convertion_intent (final_intent_met, param_sets_intent)
+      convertion_slot (final_slot_met, param_sets_slot)
       

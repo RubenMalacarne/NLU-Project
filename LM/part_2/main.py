@@ -20,11 +20,11 @@ class Parameters:
     N_EPOCHS = 100
     PATIENCE = 10
 
-    TRAINING = True
+    TRAINING = False
     EVALUATION = True
 
-    BATCH_SIZE_TRAIN  = 16
-    BATCH_SIZE        = 128
+    BATCH_SIZE_TRAIN  = 256#16
+    BATCH_SIZE        = 1024#128
 
 final_ppl_dict = {}
 
@@ -46,11 +46,11 @@ final_ppl_dict = {}
 # ]
 
 parameter_sets = [
-    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM+WT"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.001,"description": "LSTM+WT+VD"},
-    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.9,"description": "LSTM+VD+WT+NTASG"}
-]   #198 di ntasgd
+    {"BOOL_WAIT_TYINING": False,"BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"BATCH_SIZE_TRAIN" : 256 ,"BATCH_SIZE" : 1024,"description": "LSTM"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": False,"BOOL_NTASGD": False,"LR": 0.001,"BATCH_SIZE_TRAIN" : 256 ,"BATCH_SIZE" : 1024,"description": "LSTM+WT"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": False,"LR": 0.001,"BATCH_SIZE_TRAIN" : 256 ,"BATCH_SIZE" : 1024,"description": "LSTM+WT+VD"},
+    {"BOOL_WAIT_TYINING": True, "BOOL_VD": True, "BOOL_NTASGD": True, "LR": 0.9,  "BATCH_SIZE_TRAIN" : 16 ,"BATCH_SIZE" : 1024 ,"description": "LSTM+VD+WT+NTASG"}
+] 
 if __name__ == "__main__":
 
 
@@ -67,8 +67,8 @@ if __name__ == "__main__":
                                                                                                                 Parameters.DEVICE,
                                                                                                                   params["BOOL_WAIT_TYINING"],
                                                                                                                   params["BOOL_VD"],
-                                                                                                                  Parameters.BATCH_SIZE,
-                                                                                                                  Parameters.BATCH_SIZE_TRAIN)
+                                                                                                                  params["BATCH_SIZE"],
+                                                                                                                  params["BATCH_SIZE_TRAIN"])
       restemp=[]
 
       if Parameters.TRAINING:
@@ -116,6 +116,8 @@ if __name__ == "__main__":
 
         save_model(best_model,sample_params["description"])
         torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
+        
     if Parameters.EVALUATION:
       for sample_params  in parameter_sets:
           #evaluation part

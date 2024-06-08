@@ -42,15 +42,16 @@ intent_data = [
 {'F1_intent': 0.920037938263585, 'P-intent': 0.9134382043391018, 'R-intent': 0.9339305711086227, 'description': 'Original'}, 
  {'F1_intent': 0.9261963436656339, 'P-intent': 0.9224326928600552, 'R-intent': 0.9384098544232923, 'description': 'Bidirectional'}, 
  {'F1_intent': 0.9315266586759192, 'P-intent': 0.9417789681048415, 'R-intent': 0.9428891377379619, 'description': 'Bidirectional_dropout'},
- {'F1_intent': 0.9618696389635593, 'P-intent': 0.964771931716168, 'R-intent': 0.9630459126539753, 'description': 'Bert'}
+{'F1_intent': 0.961137911415364, 'P-intent': 0.9619490540009519, 'R-intent': 0.9641657334826428, 'description': 'Bert'}
 ]
 
 slot_data = [
   {'F1_slot': 0.9222378606615059, 'P-slot': 0.9206181945907973, 'R-slot': 0.923863235812478, 'description': 'Original'}, 
  {'F1_slot': 0.9391796322489391, 'P-slot': 0.9421780773323873, 'R-slot': 0.9362002114910116, 'description': 'Bidirectional'}, 
  {'F1_slot': 0.9419698314108252, 'P-slot': 0.9485346676197284, 'R-slot': 0.9354952414522383, 'description': 'Bidirectional_dropout'},
- {'F1_slot': 0.9010262654374674, 'P-slot': 0.8894230769230769, 'R-slot': 0.912936200211491, 'description': 'Bert'}
+ {'F1_slot': 0.8875780707841777, 'P-slot': 0.8739323539460199, 'R-slot': 0.9016566795911174, 'description': 'Bert'}
 ]
+
 
 
 if __name__ == "__main__":

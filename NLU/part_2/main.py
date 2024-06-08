@@ -8,7 +8,7 @@ from model import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
 
-PAD_TOKEN = 0
+
 class Parameters:
 
     DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -23,17 +23,17 @@ class Parameters:
     OUT_INT = lambda x: len(x.intent2id)  # Number of output intent
     VOCAB_LEN = lambda x: len(x.word2id)  # Vocabulary size
 
-    CRITERSION_SLOTS = nn.CrossEntropyLoss(ignore_index=PAD_TOKEN)
+    CRITERSION_SLOTS = nn.CrossEntropyLoss(ignore_index=ParametersBert.PAD_TOKEN)
     CRITERSION_INTENTS = nn.CrossEntropyLoss()  # Because we do not have the pad token
 
-    N_EPOCHS = 100
-    PATIENCE = 7
+    N_EPOCHS = 200 #100
+    PATIENCE = 3 #7
     
-    BATCH_SIZE_TRAIN  = 16
-    BATCH_SIZE        = 32
+    BATCH_SIZE_TRAIN  = 128
+    BATCH_SIZE        = 64
     
     TEST               = True
-    TRAIN              = True
+    TRAIN              = False
 
 slot_met, intent_met = [[],[],[]], [[],[],[]]
 final_intent_met = {}
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         out_int =   len(lang.intent2id)
         vocab_len = len(lang.word2id)
 
-        model = BertCstm(Parameters.HID_SIZE, out_slot, out_int, Parameters.EMB_SIZE, vocab_len,pad_index=PAD_TOKEN).to(device)
+        model = BertCstm(Parameters.HID_SIZE, out_slot, out_int, Parameters.EMB_SIZE, vocab_len,pad_index=ParametersBert.PAD_TOKEN).to(device)
         model.apply(init_weights)
 
         optimizer = optim.Adam(model.parameters(), lr=Parameters.LR)

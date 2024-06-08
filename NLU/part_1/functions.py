@@ -232,7 +232,7 @@ def load_eval_object(DEVICE,name):
     test_loader     =saving_obj["test_loader"]
     return model,lang,test_loader
 
-def convertion_dictionary (input_dict, out_dict):
+def convertion_intent (input_dict, out_dict):
     '''
         use to convert for copy paste more easly inside the NLU-plot.py file to see the results
     '''
@@ -247,5 +247,18 @@ def convertion_dictionary (input_dict, out_dict):
 
     print(out_dict)
     
-    
+def convertion_slot (input_dict, out_dict):
+    '''
+        use to convert for copy paste more easly inside the NLU-plot.py file to see the results
+    '''
+    for key, values in input_dict.items():
+          param_set = {
+              "F1_slot": values[0],
+              "P-slot": values[1],
+              "R-slot": values[2],
+              "description": key
+          }
+          out_dict.append(param_set)
+
+    print(out_dict)    
     
